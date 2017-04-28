@@ -272,11 +272,14 @@ class _LinkFile(object):
   def __linkIt(self, relSrc, absDest):
     # link file if it does not exist or is out of date
     # if not os.path.islink(absDest) or (os.readlink(absDest) != relSrc):
-    if not portable.os_path_islink(absDest) or (portable.os_path_realpath(absDest) != relSrc):
+    if not portable.os_path_islink(absDest) or (portable.os_path_realpath(absDest) != portable.os_path_realpath(relSrc)):
       try:
         # remove existing file first, since it might be read-only
         if os.path.lexists(absDest):
-          os.remove(absDest)
+          if not os.path.isdir(absDest):
+            os.remove(absDest)
+          else:
+            os.rmdir(absDest)
         else:
           dest_dir = os.path.dirname(absDest)
           if not os.path.isdir(dest_dir):
