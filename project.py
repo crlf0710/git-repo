@@ -245,12 +245,15 @@ class _CopyFile(object):
       try:
         # remove existing file first, since it might be read-only
         if os.path.exists(dest):
-          os.remove(dest)
+          portable.rm_file_or_tree(dest)
         else:
           dest_dir = os.path.dirname(dest)
           if not os.path.isdir(dest_dir):
             os.makedirs(dest_dir)
-        shutil.copy(src, dest)
+        if not os.path.isdir(src):
+          shutil.copy(src, dest)
+        else:
+          shutil.copytree(src, dest, True)
         # make the file read-only
         mode = os.stat(dest)[stat.ST_MODE]
         mode = mode & ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
@@ -276,10 +279,7 @@ class _LinkFile(object):
       try:
         # remove existing file first, since it might be read-only
         if os.path.lexists(absDest):
-          if not os.path.isdir(absDest):
-            os.remove(absDest)
-          else:
-            os.rmdir(absDest)
+          portable.rm_file_or_tree(absDest)
         else:
           dest_dir = os.path.dirname(absDest)
           if not os.path.isdir(dest_dir):

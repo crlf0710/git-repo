@@ -25,10 +25,18 @@ def rmtree(top):
     for name in files:
       filename = os.path.join(root, name)
       os.chmod(filename, stat.S_IWRITE)
-      os.remove(filename)
+      rm_file_or_tree(filename)
     for name in dirs:
-      rmtree(os.path.join(root, name))
+      rm_file_or_tree(os.path.join(root, name))
   os.rmdir(top)
+
+def rm_file_or_tree(path):
+  if not os.path.isdir(path):
+    os.remove(path)
+  elif os_path_islink(path):
+    os.rmdir(path)
+  else:
+    rmtree(path)
 
 def rename(src, dst):
   if isUnix():
